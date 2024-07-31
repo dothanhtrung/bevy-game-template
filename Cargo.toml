@@ -1,0 +1,64 @@
+[package]
+name = "your_game"
+version = "0.0.1"
+authors = ["Your Name <your email>"]
+edition = "2021"
+categories = ["games"]
+
+[dependencies]
+# Remove dynamic when release
+bevy = { version = "0.14" }
+bevy-inspector-egui = { version = "0.25", optional = true }
+bevy_asset_loader = { version = "0.21", features = [
+    "2d",
+    "standard_dynamic_assets",
+] }
+bevy_ineffable = {version = "0.6"}
+bevy_text_edit = {version = "0.2"}
+
+[features]
+default = []
+debug = ["bevy/dynamic_linking", "bevy-inspector-egui"]
+
+# Enable a small amount of optimization in debug mode
+[profile.dev]
+opt-level = 1 # Enable a small amount of optimization in debug mode
+
+# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
+[profile.dev.package."*"]
+opt-level = 3
+
+# Remove expensive debug assertions due to <https://github.com/bevyengine/bevy/issues/14291>
+[profile.dev.package.wgpu-types]
+debug-assertions = false
+
+[profile.release]
+lto = "thin"
+opt-level = "s"
+codegen-units = 1
+strip = "debuginfo"
+debug = false
+
+[profile.wasm-release]
+# Use release profile as default values
+inherits = "release"
+opt-level = "z"
+
+[package.metadata.android]
+build_targets = ["aarch64-linux-android"]
+
+[package.metadata.android.sdk]
+target_sdk_version = 33
+
+[lib]
+name = "your_game"
+path = "src/lib.rs"
+# crate-type = [
+#     "staticlib",
+#     "cdylib",    # needed for Android
+#     "rlib",      # rlib needed for running locally
+# ]
+
+[[bin]]
+name = "your_game"
+path = "src/main.rs"
